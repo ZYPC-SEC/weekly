@@ -790,3 +790,585 @@ var cipherText,_=rsa.EncryptOAEP(sha256.New(),rand.Reader,pubKey,[]byte(msg),nil
 var decText,_=rsa.DecryptOAEP(sha256.New(),rand.Reader,prvKey,cipherText,nil);
 ```
 
+### 存储密钥
+
+```go
+import "crypto/x509";
+var prvkey,_=rsa.GenerateKey(rand.Reader,512);
+var pubkey=&prvkey.PublicKey;
+keydata:=x509.MarshalPKCS1PrivateKey(prvkey);
+ioutil.WriteFile("myPrvkey",keydata,0600);//写入文件
+var testmsg="测试消息";
+var cipherdata,_=rsa.EncryptPKCS1v15(rand.Reader,pubkey,[]byte(testmsg));
+indata,err:=ioutil.ReadFile("myPrvkey");
+if(err!=nil){
+	fmt.Println(err);
+	return;
+};
+loadKey,err:=x509.ParsePKCS1PrivateKey(indata);
+if(err!=nil){
+	fmt.Println(err);
+	return;
+};
+decrdata,err:=rsa.DecryptPKCS1v15(rand.Reader,loadKey,cipherdata);
+if(err!=nil){
+	fmt.Println(err);
+	return;
+};
+fmt.Printf("%s\n",decrdata);
+```
+
+### PEM编码
+
+编码与解码：
+
+```go
+var content="...";
+var block pem.Block;
+block.Type="DEMO";
+block.Bytes=[]byte(content);
+var encodeData=pem.EncodeToMemory(&block);
+var decblock,_=pem.Decode(encodeData);
+fmt.Printf("%s\n%s\n",decblock.Type,decblock.Bytes);//消息类型、消息正文
+```
+
+解码后保留数据：
+
+```go
+var pemData=`
+-----BEGIN MY NAME------
+546L5aSn5bGx
+-----END MY NAME------
+Hello, Jim`
+var msgblock,other=pem.Decode([]byte(pemData));
+fmt.Printf("%s\n%s\n%s\n",msgblock.Type,msgblock.Bytes,other);
+```
+
+消息头：
+
+```go
+var msg="...";
+var headers=map[string]string{
+	"ver":"1.0",
+	"sender":"Jack",
+	"copyto":"Tom",
+};
+block:=pem.Block{
+	Type:"EMSG",
+	Bytes:[]byte(msg),
+	Headers:headers,
+};
+pem.Encode(os.Stdout,&block);
+```
+
+## 接口与结构体
+
+### 结构体
+
+```go
+type person struct{
+    name string;//首字母为小写的只能在当前包中访问
+    age uint8;
+    weight,height float32;
+    gender uint8;
+};
+var g=person{
+    name:"...",
+    //...
+};
+var pc *person=&person{
+    "...",
+    //...
+};
+```
+
+结构体方法：在结构体外部定义
+
+```go
+type test struct{
+    //...
+};
+func(o test)doSomething()string{
+    test.data=1;
+    return "dosomething";
+};
+```
+
+### 接口的实现
+
+```go
+type Locker interface{
+	Lock() uint16;
+	Unlock(id uint16);
+};
+type interLocker struct{
+	lockID uint16;
+};
+func(l *interLocker)Lock()uint16{
+	l.lockID++;
+	return l.lockID;
+};
+func(l *interLocker)Unlock(id uint16){
+	if(id!=l.lockID){
+		return;
+	};
+};
+func main(){
+	var lk Locker;
+	lk=&interLocker{};//interLocker实现了Locker
+	id:=lk.Lock();
+	lk.Unlock(id);
+	return;
+};
+```
+
+### 空接口
+
+```go
+var obj interface{};
+obj=12345;
+obj="xyz";
+//...
+```
+
+### 类型嵌套
+
+```go
+type base struct{
+	code uint;
+	line uint64;
+	label string;
+};
+type dev struct{
+	base;
+	size float32;
+	publisher string;
+};
+var x dev
+//一种正确的写法
+x.base.code=1001;
+x.base.line=1;
+x.base.label="F7";
+//另一种正确的写法
+x.code=1001;
+x.line=1;
+x.label="F7";
+var y=dev{
+	base:base{1002,1,"D6"},//或：base{1002,1,"D6"},
+	size:0.12,
+	publisher:"Dick"
+};
+```
+
+### 类型断言
+
+```go
+var x interface{}=float64(0.00123);
+y,ok:=x.(float64);
+if(ok){
+    fmt.Printf("%T\n",y);//float64
+}else{
+    //断言失败
+};
+```
+
+## 数组与切片
+
+### 数组
+
+```go
+var f=[5]uint32{18};//第一个值18，后面的默认0
+s:=[3]interface{}{"abc",887,'H'};
+r:=[...]int32{800,500,1600,2400,900,700};//自动计算长度为6
+n:=len(r);
+var b=[5][4][3]int32;
+```
+
+### 切片
+
+```go
+s:=x[2:4];//[2,4)
+s3:=a[:];//全部
+```
+
+### 追加
+
+```go
+var sf=[]float32{0.001,0.0007};
+sf=append(sf,0.0008,0.1205);//添加2个元素
+```
+
+## 映射与链表
+
+### 映射的初始化
+
+```go
+//只有以下方法初始化才能继续添加元素
+//法一
+var m1=make(map[uint16]string);
+//法二
+var m2=map[rune]float64{};
+//法三
+var m3=map[string]uint64{
+	"item1":8150,
+	//...
+};
+```
+
+### 映射的枚举
+
+```go
+myMap:=map[string]int{
+	"task-01":1000,
+	//...
+};
+for key,val:=range myMap{
+	fmt.Printf("%s\n%d\n",key,val);
+};
+```
+
+### 映射的存在性检验
+
+```go
+var m=map[string]int{};
+xv:=m["c3"];//该值如果不存在，返回默认值0
+xv,ok:=m["c3"];
+if ok{
+    //存在
+}else{
+    //不存在
+};
+```
+
+## 字符串
+
+### Fprint
+
+```go
+file,err:=os.Create("*.txt");
+if(err!=nil){
+	fmt.Println(err);
+	return;
+};
+fmt.Fprintln(file,"...");
+```
+
+### uint32转字符串
+
+```go
+var h uint32=55660;
+hs:=strconv.FormatUint(uint64(h),10);
+fmt.Println("%s\n",hs);
+```
+
+### 特殊格式控制符
+
+```
+%t 布尔
+%T 对象的类型
+%v 默认格式打印值
+%+v 对于结构体对象只打印值
+%#v 打印出来的是一个有效的Go语言表达式
+%#b 带前缀二进制
+%#o 带前缀八进制
+%#x 带前缀十六进制
+%#X 带前缀大写字母十六进制
+```
+
+### 参数索引
+
+```go
+fmt.Printf("%[2]s:%[1]d",120,"item");
+```
+
+### 文件中读入文本
+
+```go
+fileName:="data.txt";
+var file,err=os.Open(fileName);
+if(err!=nil){
+	fmt.Println("%v\n",err);
+	return;
+};
+defer file.Close();
+err=nil;
+var line string;
+var lineNo uint;
+for{
+	_,err=fmt.Fscanln(file,&line);
+	lineNo++;
+	if(err==io.EOF){
+		break;
+	};
+	fmt.Printf("%-4d%s\n",lineNo,line);
+};
+```
+
+### Stringer接口
+
+```go
+type Stringer interface{
+	String() string;
+};
+type Product struct{
+	Pid uint;
+	ProdName string;
+	ProdDate string;
+	ProdColor string
+};
+func (p Product)String()string{
+	return fmt.Sprintf("...");//自定义输出格式
+};
+var vp=Product{
+	Pid:41920014,
+	ProdName:"xxx",
+	ProdColor:"xxx",
+	ProdDate:"...",
+};
+fmt.Println(vp);//以下三行输出结果相同，均为自定义输出格式
+fmt.Println("%v",vp);
+fmt.Println("%s",vp);
+```
+
+### Join
+
+```go
+var s="xx"+"xx";
+
+var strs=[]string{"xxx","xxx",...};
+var out=strings.Join(strs,"#");//用#将strs连接起来
+```
+
+### Replace
+
+```go
+var a="xxx";
+var b=strings.Replace(a,"a","b",2);//将字符串a中字符a替换为b，最多替换2次，0次可省略表示不限次数
+```
+
+### Split
+
+```go
+var res=strings.Split(s,"#");//以#为分隔符切分字符串s，数组保存到res
+var res=strings.SplitN(s,"#",2);//同上，只切分为2份
+var res=strings.SplitAfter(s,"#");//在#后分割（保留分隔符）
+var res=strings.SplitAfterN(s,"#",2);//同上，只切分为2份
+```
+
+### HasPrefix、HasSuffix
+
+```go
+res:=strings.HasPrefix(s,"st");//字符串s是否以st为前缀，返回bool
+res:=strings.HasSuffix(s,"st");//同上，后缀
+```
+
+### Index、LastIndex
+
+```go
+index1:=strings.Index(text,"xxx");//text中第一次出现xxx的字节位置，找不到-1
+index2:=strings.LastIndex(text,"xxx");//同上，最后一次
+
+func runeIndexOf(src string,byteIndex int)int{//真实位置方法
+	if(byteIndex<=0){
+		return byteIndex;
+	};
+	theBuffer:=[]byte(src)[:byteIndex];
+	str:=string(theBuffer);
+	rs:=[]rune(str);
+	return len(rs);
+};
+```
+
+### TrimPrefix、TrimSuffix、TrimSpace、Trim、TrimLeft、TrimRight
+
+```go
+var str2=strings.TrimPrefix(str,"ftp://");//去除前缀
+var str2=strings.TrimSuffix(str,".xct");//去除后缀
+var str2=strings.TrimSpace(str);//去除首尾空格
+var str2=strings.Trim(s,"abcd");//当字符串s首尾出现abcd之一任意则删除，直到首尾字符都不为abcd任一字符
+var str2=strings.TrimLeft(s,"abcd");//同上，只首
+var str2=strings.TrimRight(s,"abcd");//同上，只尾
+```
+
+### Repeat
+
+```go
+var str2=strings.Repeat(s,3);//字符串s重复3次
+```
+
+### ParseInt、ParseUint、ParseFloat
+
+```go
+var str="0xB20D8A";
+var n,err=strconv.ParseInt(str,0,32);//将字符串str转化为指定进制数字
+//这里转化为0进制数表示根据前缀自动判断进制
+/*
+	其他函数（用法同ParseInt）：
+	ParseUint
+	ParseFloat
+
+
+	0 int uint
+	8 int8 uint8
+	16 int16 uint16
+	32 int32 uint32 float32
+	64 int64 uint64 float64
+*/
+if(err!=nil){
+	fmt.Println(err);
+	return;
+};
+fmt.Printf("%q-->%v\n",str,int32(n));
+```
+
+### ToUpper、ToLower
+
+```go
+var y=strings.ToLower(x);
+var y=strings.ToUpper(x);
+```
+
+### Build
+
+```go
+var bd=new(strings.Builder);
+bd.WriteString("aaa");
+bd.WriteRune('\n');
+fmt.Printf("%s\n",bd);
+var str=bd.String();
+```
+
+## 数学函数
+
+### 常用函数
+
+```go
+r1:=math.Abs(x1);//参数float64
+r1:=math.Max(x1,x2);//参数浮点数
+r1:=math.Min(x1,x2);//参数浮点数
+r1:=math.Pi
+r1:=math.Sin(r);
+r1:=math.Cos(r);
+var s,c=math.Sincos(r);
+rad:=math.Atan2(y,x);//计算方位角
+result:=math.Pow(bs,exp);
+result:=math.Pow10(8);
+r:=math.Sqrt(n);
+r:=math.Cbrt(n);
+```
+
+### big
+
+#### 加减操作
+
+```go
+var(
+	num1="123456789";
+	num2="123456789";
+);
+var bigInt1=new(bit.Int);
+var bigInt2=new(bit.Int);
+bigInt1.SetString(num1,10);
+bigInt2.SetString(num2,10);
+var res1=new(big.Int);
+res1.Add(bigInt1,bigint2);
+var res2=new(bit.Int);
+res2.Sub(bigInt1,bigInt2);
+fmt.Printf("%d,%d\n",res1,res2);
+```
+
+#### 阶乘
+
+```go
+var c=new(big.Int);
+c.MulRange(1,30);//阶乘，求积范围为[1,30]
+```
+
+#### 大浮点数
+
+```go
+var strfloat="0.41646416489403";
+var bigFloat=new(big.Float);
+bigFloat.SetPrec(50);//精度
+bigFloat.SetString(strfloat);
+fmt.Printf("%.50f\n",bigFloat);
+bigRes=new(big.Float);
+bigRes.SetPrec(100);
+bigRes.Add(bigFa,bigFb);
+bigRes.Sub(bigFa,bigFb);
+bigRes.Mul(bigFa,bigFb);
+bigRes.Quo(bigFa,bigFb);
+```
+
+### 随机数
+
+```go
+import("math\rand");
+n=rand.Float32();
+n=rand.Float64();
+
+n=rand.Int();
+n=rand.Int31();
+n=rand.Int63();
+n=rand.Uint32();
+n=rand.Uint64();
+
+//以下函数指定范围最大值（不包含）
+n=rand.Intn(100);
+n=rand.Int31n(100);
+n=rand.Int63n(100);
+
+//设置随机数种子
+timestamp:=time.Now().Unix();
+rand.Seed(timestamp);
+```
+
+### 随机全排列
+
+```go
+var ints=rand.Perm(5);
+for _,v:=range ints{
+    fmt.Println(v);
+};
+```
+
+### 洗牌
+
+```go
+var list=[]int{1,2,3,4,5,6,7};
+var swap=func(i,j int){
+    list[i],list[j]=list[j],list[i];
+};
+var ln=len(list);
+rand.Shuffle(ln,swap);
+```
+
+### 随机字节序
+
+```go
+var file,err=os.Create("test.data");
+if(err!=nil){
+    fmt.Prinln(err);
+    return;
+};
+rand.Seed(time.Now().Unix());
+buffer:=make([]byte,100);
+rand.Read(buffer);
+file.Write(buffer);
+file.Close();
+
+//读取
+fileToRead,err:=os.Open("test.data");
+if(err!=nil){
+    fmt.Println(err);
+    return;
+};
+readBuf:=make([]byte,16);
+for{
+    n,err:=fileToRead.Read(readBuf);
+    if(err!=io.EOF){
+        break;
+    };
+    fmt.Printf("%x",readBuf[:n]);
+};
+```

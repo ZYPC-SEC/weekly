@@ -169,3 +169,91 @@ mathjax: true
 {% endraw%}
 ```
 
+## 九、图片上传
+
+安装插件：
+
+```bahs
+npm install hexo-asset-image --save
+```
+
+再找到Hexo的配置文件`_config.yml`，中改为：
+
+```yaml
+post_asset_folder: true
+```
+
+这样一来，在每次新建文章时，`source\_posts`目录下会出现一个`*.md`和一个同名文件夹。将图片放入文件夹内。例如将`1.png`放入文件夹内，Markdown中这样写：
+
+```markdown
+![](1.png)
+```
+
+一般这样来说就行了。有可能出现版本问题导致路径不对。打开`\node_modules\hexo-asset-image\index.js`，替换为以下代码：
+
+```javascript
+'use strict';
+var cheerio = require('cheerio');
+
+// http://stackoverflow.com/questions/14480345/how-to-get-the-nth-occurrence-in-a-string
+function getPosition(str, m, i) {
+  return str.split(m, i).join(m).length;
+}
+
+var version = String(hexo.version).split('.');
+hexo.extend.filter.register('after_post_render', function(data){
+  var config = hexo.config;
+  if(config.post_asset_folder){
+        var link = data.permalink;
+    if(version.length > 0 && Number(version[0]) == 3)
+       var beginPos = getPosition(link, '/', 1) + 1;
+    else
+       var beginPos = getPosition(link, '/', 3) + 1;
+    // In hexo 3.1.1, the permalink of "about" page is like ".../about/index.html".
+    var endPos = link.lastIndexOf('/') + 1;
+    link = link.substring(beginPos, endPos);
+
+    var toprocess = ['excerpt', 'more', 'content'];
+    for(var i = 0; i < toprocess.length; i++){
+      var key = toprocess[i];
+ 
+      var $ = cheerio.load(data[key], {
+        ignoreWhitespace: false,
+        xmlMode: false,
+        lowerCaseTags: false,
+        decodeEntities: false
+      });
+
+      $('img').each(function(){
+        if ($(this).attr('src')){
+            // For windows style path, we replace '\' to '/'.
+            var src = $(this).attr('src').replace('\\', '/');
+            if(!/http[s]*.*|\/\/.*/.test(src) &&
+               !/^\s*\//.test(src)) {
+              // For "about" page, the first part of "src" can't be removed.
+              // In addition, to support multi-level local directory.
+              var linkArray = link.split('/').filter(function(elem){
+                return elem != '';
+              });
+              var srcArray = src.split('/').filter(function(elem){
+                return elem != '' && elem != '.';
+              });
+              if(srcArray.length > 1)
+                srcArray.shift();
+              src = srcArray.join('/');
+              $(this).attr('src', config.root + link + src);
+              console.info&&console.info("update link as:-->"+config.root + link + src);
+            }
+        }else{
+            console.info&&console.info("no src attr, skipped...");
+            console.info&&console.info($(this));
+        }
+      });
+      data[key] = $.html();
+    }
+  }
+});
+```
+
+
+

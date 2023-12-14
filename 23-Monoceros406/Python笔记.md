@@ -907,3 +907,52 @@ pyautogui.prompt('...') #返回输入字符串
 pyautogui.password('...') #返回输入密码
 ```
 
+## 查缺补漏
+
+```python
+#is运算符：内存地址相同
+colors1=['red','yellow','blue']
+colors2=['red','yellow','blue'] #colors1==colors2
+colors3=colors2 #colors2 is colors3
+
+#函数可变参
+def f(*args,**kwargs):
+    print(args)
+    print(kwargs)
+f() #() {}
+f(1,2) #(1,2) {}
+f(a='a1',b='b1') #() {'a':'a1','b':'b1'}
+f(1,2,a='a1',b='b1') #(1,2) {'a':'a1','b':'b1'}
+
+#sorted
+print(sorted(1,5,4,2,3));
+print(sorted((1,5,4,2,3),reverse=True))
+
+#filter
+def divisible_by_24(x):
+    if x%24==0:
+        return True;
+    return False;
+l=filter(diviisible_by_24,range(1,101))
+print(list(l))
+
+#map
+def multiplied_by_2(x):
+    return x*2
+l=map(multiplied_by_2,range(1,11))
+print(list(l))
+def multiply(x,y):
+    return x*y
+l=map(multiply,range(1,11),range(1,11))
+print(list(l))#1,4,9,...
+
+#lambda表达式
+add2=lambda x,y:x+y
+result=add2(1,2)
+print(result)
+result=(lambda x,y:x+y)(1,2)
+print(result)
+l=filer(lambda x:x%24==0,range(1,101))
+print(list(l))
+```
+

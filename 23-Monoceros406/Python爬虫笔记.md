@@ -888,5 +888,447 @@ soup.select('p[value="1"]') #获取属性value="1"的p节点
 soup.select_one('a') #获取a节点中第一个a节点内容
 ```
 
+## 动态渲染信息
 
+### Ajax
+
+F5刷新网页，F12中找到“网络”，选择“XHR”，选择某请求后查看“相应”，追到JSON信息，解析即可。消息头中有“请求网址”。
+
+```python
+import requests,time,random,os,re
+json_url='http://api.vc.bilibili.com/board/v1/ranking/top?page_size=10&next_offset={page}1&tag=...&platform=pc'
+class Crawl():
+    def __init__(self):
+        self.headers={'User-Agent':'Mozilla/5.0 ...'}
+    def get_json(self,json_url):
+        response=requests.get(json_url,headers=self.headers)
+        if response.status_code==200:
+            return response.json()
+        else:
+            #获取JSON失败
+    #视频批量下载：
+    def download_video(self,video_url,titlename):
+        response=requests.get(video_url,headers=self.headers,stream=True)
+        if not os.path.exists('video'):
+            os.mkdir('video')
+        if response.status_code==200:
+            with open('video/'+titilename_'.mp4','wb')as f:
+                for data in resposne.iter_content(chunk_size=1024):
+                    f.write(data)
+                    f.flush()
+                print('下载完毕')
+        else:
+            print('获取失败')
+if __name__=='__main__':
+    c=Crawl()
+    for page in raneg(0,10):
+        json=c.get_json(json_url.format(page=page))
+        infos=json['data']['items']
+        for info in infos:
+            title=info['item']['description']
+            video_url=info['item']['video_playurl']
+            print(title,video_url)
+        time.sleep(random.randint(3,6))
+    comp=re.compile('[^A-Z^a-z^0-9^\u4e00-\u9fa5]') #只中英文、数字
+    title=comp.sub('',titile) #其他替换为空
+    c.download_video(video_url,title)
+```
+
+### selenium
+
+Edge驱动安装方法：
+
+去这里下载符合自己版本的驱动：https://developer.microsoft.com/zh-cn/microsoft-edge/tools/webdriver/，解压并设置为环境变量，改名为`MicrosoftWebDriver.exe`。
+
+运行以下代码能打开百度就行：
+
+```python
+from selenium import webdriver
+driver=webdriver.Edge()
+driver.get("https://www.baidu.com")
+```
+
+以下代码以Chrome驱动为例：获取京东商品信息。
+
+```python
+from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
+try:
+    chrome_options=webdriver.ChromeOptions()#加载驱动器参数对象
+    prefs={"profile.managed_default_content_settings.images":2}#不加载图片
+    chrome_options.add_experimental_option("prefs",prefs)
+    chrome_options.add_argument('--headless')#无界面浏览器模式
+    chrome_options.add_argument('--disable-gpu')
+    driver=webdriver.Chrome(options=chrome_options,executeable_path='.../chromedriver.exe')#加载驱动
+    driver.get('https://item.jd.com/12353915.html')#请求
+    wait=WebDriverWait(driver,10)#等10秒
+    wait.until(expected_conditions.presence_of_element_located((By.CLASS_NAME,"m-item-inner")))#等待加载class名称为m-item-inner的节点，该节点包含商品信息
+    name_div=driver.find_element_by_css_selector('#name').find_elements_by_tag_name('div')#name节点中所有div节点
+    summary_price=driver.find_element_by_id('summary-price')
+    print(name_div[0].text.name_div[1].text,name_div[4].text,summary_price.text)#商品标题、宣传语、编著信息、价格信息
+    driver.quit()#退出浏览器驱动
+except Exception as e:
+    print(e)
+```
+
+获取网页节点有两种方法：
+
+**法一：**
+
+> 获取多个节点时，在element后加s即可。
+
+```python
+driver.find_element_by_id()
+driver.find_element_by_name()
+driver.find_element_by_xpath()
+driver.find_element_by_link_text()
+driver.find_element_by_tag_name()
+driver.find_element_by_class_name()
+driver.find_element_by_css_selector()
+```
+
+**法二：**
+
+```python
+name_div=driver.find_element(By.ID,'name').find_element(By.TAG_NAME,'div')
+print(name_div[0].text)
+```
+
+其他属性：
+
+```
+By.ID By.LINK_TEXT By.PARTIAL_LINK_TEXT By.NAME By.TAG_NAME By.CLASS_NAME By.CSS_SELECTOR By.XPATH
+```
+
+获取属性方法：
+
+```python
+href=driver.find_element(By.XPATH,'//*[@id="p-author"]/a[1]').get_attribute('href')
+print(href)
+```
+
+## 进程与线程
+
+### 线程创建
+
+#### threading模块创建：
+
+```python
+import threading,time
+def process():
+    for i in range(3):
+        time.sleep(1)
+        print(threading.current_thread().name)
+if __name__=='__main__':
+    threads=[threading.Thread(target=process)for i in range(4)] #args、kwargs等参数详情Python笔记
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+```
+
+#### Thread子类创建：
+
+```python
+import threading,time
+class SubThread(threading.Thread):
+    def run(self):
+        for i in range(3):
+            time.sleep(1)
+            msg=self.name+str(i)
+            print(msg)
+if __name__=='__main__':
+    t1=SubThread()
+    t2=SubThread()
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+```
+
+### 互斥锁
+
+```python
+from threading import Thread,Lock
+import time
+n=100
+def task():
+    global n
+    mutex.acquire()#其他线程等待该线程release
+    temp=n
+    time.sleep(0.1)
+    n=temp-1
+    mutex.release()
+if __name__=='__main__':
+    mutex=Lock()
+    t_l=[]
+    for i in range(10):
+        t=Thread(taret=task)
+        t_l.append(t)
+        t.start()
+    for t in t_l:
+        t.join()
+```
+
+### 线程间通信
+
+使用Queue模块，Producer将数据加入Queue，Consumer从Queue中获取，有则取出，无则阻塞等待。
+
+```python
+from queue import Queue
+import random,threading,time
+class Producer(threading.Thread):
+    def __init__(self,name,queue):
+        threading.Thread.__init__(self,name=name)
+        self.data=queue
+    def run(self):
+        for i in range(5):
+            self.data.put(i)
+            time.sleep(random.random())
+class Consumer(threading.Thread):
+    def __init__(self,name,queue):
+        threading.Thread.__init__(self,name=name)
+        self.data=queue
+    def run(self):
+        for i in range(5):
+            val=self.data.get()
+            time.sleep(random.random())
+if __name__=='__main__':
+    queue=Queue()
+    producer=Producer('Producer',queue)
+    consumer=Consumer('Consumer',queue)
+    producer.start()
+    consumer.start()
+    producer.join()
+    consumer.join()
+```
+
+### 进程创建
+
+#### 使用multiprocessing模块创建：
+
+```python
+from multiprocessing import Process
+import time,os
+def child_1(interval):
+    print(os.getpid(),os.getppid()) #子进程pid 父进程pid
+    t_start=time.time()
+    time.sleep(interval)
+    t_end=time.time()
+    print(os.getpid(),t_end-t_start)
+def child_2(interval):
+    print(os.getpid(),os.getppid())
+    t_start=time.time()
+    time.sleep(interval)
+    t_end=time.time()
+    print(os.getpid(),t_end-t_start)
+if __name__=='__main__':
+    print(os.getpid())
+    p1=Process(target=child_1,args=(1,))
+    p2=Process(target=child_2,name="xxx",args=(2,))
+    p1.start()
+    p2.start()
+    print(p1.is_alive())
+    print(p2.is_alive())
+    print(p1.name,p1.pid,p2.name,p2.pid)
+    p1.join()
+```
+
+常用方法、属性：
+
+```python
+is_alive() 判断是否还在执行
+join([timeout]) 是否等待进程执行结束，或等待多少秒
+start() 启动
+run() 如果没有给定target参数，调用start方法时执行对象中的run方法
+terminate() 不管任务完成是否，立即终止
+```
+
+#### 使用Process子类创建进程
+
+```python
+from multiprocessing import Process
+import time,os
+class SubProcess(Process): #继承Process
+    def __init__(self,interval,name=''): #重写__init__
+        Process.__init__(self)
+        self.interval=interval
+        if name:
+            self.name=name
+    def run(self): #重写run
+        print(os.getpid(),os.getppid())
+        t_start=time.time()
+        time.sleep(self.interval)
+        t_stop=time.time()
+        print(os.getpid(),t_stop-t_start)
+if __name__=='__main__':
+    print(os.getpid())
+    p1=SubProcess(interval=1,name='xxx')
+    p2=SubProcess(interval=2)
+    p1.start()
+    p2.start()
+    print(p1.is_alive(),p2.is_alive,p1.name,p1.pid,p2.name,p2.pid)
+    p1.join()
+    p2.join()
+```
+
+#### 使用进程池创建
+
+```python
+from multiprocessing import Pool
+import os,time,random
+def task(name):
+    print('子进程%s:%s'%(os.getpid(),name))
+    time.sleep(1)
+if __name__=='__main__':
+    print('%s'%os.getpid())
+    p=Pool(3)
+    for i in range(10):
+        p.apply_async(task,args=(i,))
+    print('等待所有子进程结束')
+    p.close()
+    p.join()
+    print('所有子进程结束')
+```
+
+### 消息队列
+
+```python
+from multiprocessing import Process,Queue
+import time
+def write_task(q):
+    if not q.full():
+        for i in range(5):
+            message='message'+str(i)
+            q.put(message)
+            print('write:%s'%message)
+def read_task(q):
+    time.sleep(1)
+    while not q.empty():
+        print('read:%s'%q.get(True,2)) #等2秒，没读到则抛出Queue.Empty异常
+if __name__=='__main__':
+    q=Queue()
+    pw=Process(target=write_task,args=(q,))
+    pr=Process(target=read_task,args(q,))
+    pw.start()
+    pr.start()
+    pw.join()
+    pr.join()
+```
+
+常用方法：
+
+```python
+Queue.qsize() 返回包含的信息数量
+Queue.empty() 队列为空返回True，否则False
+Queue.full() 队列满了返回True，否则False
+Queue.get([block[,timeout]]) 获取一条信息并删除
+	当block为默认True时，程序被阻塞，知道读到消息。如果设置了timeout，则等待timeout无消息抛出Queue.Empty异常。
+    当block为False时，如果队列为空，立即抛出Queue.Empty异常。
+Queue.get_nowait()
+Queue.put(item,[block[,timeout]]) 写入队列
+	当没有空间可写时，等待腾出空间。机制同get，抛出Queue.Full异常。
+```
+
+### 实战
+
+```python
+import requests,re,time
+from fake_useragent import UserAgent
+from multiprocessing import Pool
+from bs4 import BeautifulSoup
+class Spider():
+    def __init__(self):
+        self.info_urls=[]
+    def get_home(self,home_url):
+        header=UserAgent().random
+        home_response=requests.get(home_url,header)
+        if home_response.status_code==200:
+            home_response.encoding='gb2312'
+            html=home_response.text
+            details_urls=re.findall('<a href="(.*?)" class="ulink">',html)
+            self.info_urls.extend(details_urls)
+if __name__=='__main__':
+    home_url=['http://www.ygdy8.net/html/gndy/dyzz/list_23_{}.html'.format(str(i))for i in range(1,11)]
+    s=Spider()
+    pool=Pool(processes=4)
+    pool.map(s.get_home,home_url)
+```
+
+## 验证码识别
+
+### 安装
+
+Tesseract下载地址：https://github.com/UB-Mannheim/tesseract/wiki。默认安装，将\Tesseract-OCR\tessdata文件夹设为TESSDATA_PREFIX环境变量。安装tesseract模块：
+
+```bash
+pip install tesserocr
+```
+
+### 验证码图片下载
+
+```python
+import requests,urllib.request
+from fake_useragent import UserAgent
+from bs4 import BeautifulSoup
+header={'User-Agent':UserAgent().random}
+url='http://xxx'
+response=requests.get(url,header)
+response.encoding='utf-8'
+html=BeautifulSoup(response.text,"html.parser")
+src=html.find('img').get('src')
+img_url=url+src
+urllib.request.urlretrieve(img_url,'code.png')
+```
+
+### 验证码识别
+
+```python
+import tesserocr
+from PIL import Image
+img=Image.open('*.jpg')
+
+#常规识别
+code=tesserocr.image_to_text(img)
+print(code)
+
+#灰度图片
+img=img.conver('L')
+code=tesserocr.image_to_text(img)
+print(code)
+
+#二值化处理
+img=img.conver('L')
+t=155 #阈值 可调
+table=[]
+for i in range(256):
+    if i<t:
+        table.append(0)
+    else:
+        table.append(1)
+img=img.point(table,'1')
+code=tesserocr.image_to_text(img)
+print(code)
+```
+
+### 滑动拼图验证码
+
+```python
+from selenium import webdriver
+import re
+driver=webdriver.Chrome()
+driver.get('http://xxx/')
+swiper=driver.find_element_by_xpath('/html/body/div/div[2]/div[2]/span[1]') #获取按钮滑块
+action=webdriver.ActionChains(driver)
+action.click_and_hold(swiper).perform()
+action.move_by_offset(0,0).perform() #不滑动，不松手 不然无法获得left值
+verify_style=driver.find_element_by_xpath('/html/body/div/div[2]/div[1]/div[1]').get_attribute('style') #图形滑块
+verified_style=driver.find_element_by_xpath('/html/body/div/div[2]/div[1]/div[2]').get_attribute('style') #空缺滑块
+verified_left=float(re.findall('left: (.*?)px;',verified_style)[0])
+verify_left=float(re.findall('left: (.*?)px;',verify_style)[0])
+action.move_by_offset(verified_left-verify_left,0) #向右滑动
+action.release().perform()
+```
 

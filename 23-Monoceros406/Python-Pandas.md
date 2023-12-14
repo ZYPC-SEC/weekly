@@ -58,7 +58,7 @@ df=pandas.read_excel(
 print(df)
 ```
 
-## 读取复杂表头Excel
+### 读取复杂表头Excel
 
 ```python
 pandas.set_option('display.max_columns',None)
@@ -69,12 +69,40 @@ pandas.set_option('display.max_columns',None)
     display.max_rows/display.min_rows 最多/少显示行数 None无限制
     display.precision 浮点精度（小数点后位数） 默认6 38以上不使用科学计数法
 """
-df=pandas.read_excel(file_name,sheet_name=1,header=None,usecols='A:P',nrows=7,skiprows=2,
-                     names=['新表头1','新表头2',...])
+df=pandas.read_excel(file_name,sheet_name=1,header=None,usecols='A:P',nrows=7,skiprows=2,names=['新表头1','新表头2',...])
 """
-    常用参数：
-    
+    常用参数（索引从0开始）：
+    skiprows=2 跳过前2行
+    skiprows=[1,4] 跳过第2行和第5行
+    sheet_name=1 读取第2个工作表
+    sheet_name='流失率' 读取指定名称工作表
+    sheet_name=[0,1] 读取第1~2个工作表，返回字典形式DataFrame，df[0]为第一个工作表
+    header=None 默认第一行为表头名称
+    header=1 指定第二行为表头名称，重复名称出现.1之类后缀，空值出现Unnamed:2之类
+    names=['地区','3月存量','3月流失量'] 设置各列字段名，与列数对应
+    usecols='A:B,E:E' 读取A:B和E:E列
+    usecols=[0,1,4] 读取第1、2和5列
+    nrows=6 读取6行数据，不含跳过的行
 """
 df.to_excel(result_file,sheet_name='...',index=False)
+"""
+	常用参数：
+	sheet_name='流失率' 设置工作表名，不指定则自动分配Sheet1
+	index=False 不输出索引，表头被重新定义
+"""
+```
+
+## JSON文件读写
+
+### txt转JSON
+
+```python
+folder_name=os.path.dirname(__file__)
+file_name=os.path.join(folder_name,'test.txt')
+df=pandas.read_csv(file_name,encoding='GBK')
+ascii_json=os.path.join(folder_name,'ascii.json')
+df.to_json(ascii_json,force_ascii=False) #防中文字符被强制转为Unicode
+df_json=pandas.read_json(ascii_json)
+print(df_json)
 ```
 
