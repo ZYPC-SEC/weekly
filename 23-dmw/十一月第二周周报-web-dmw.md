@@ -1,6 +1,4 @@
 ## 本周重点
-- 在nss和buu上做了好多web题虽然大部分都很基础，其中重点看了看sql注入，也是又积累了几种sql姿势
-- python作业，英语不好真的很吃亏，和开源报告一样，国内直接找到的资料都是几个月前的了，最近一周的基本都是英文资料，需要不停的翻译
 ### 1.FSCTF2023 ez_php1
 ```
  <?php
@@ -232,6 +230,10 @@ echo(serialize($a));
 ![78472c137fcacb12f25073e6577a668b.png](https://cdn.nlark.com/yuque/0/2023/png/39174886/1699536682743-900ece12-d3c6-4354-9fe3-f17bc77a1c25.png#averageHue=%23fcfbfb&clientId=u72270d6e-ec62-4&from=paste&height=695&id=u9813521c&originHeight=869&originWidth=1917&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=126250&status=done&style=none&taskId=ue64068b3-6d87-4cee-9d6f-9e175351fe0&title=&width=1533.6)
 再构造cat /flag传参得到flag
 ![302a73c4c3cb6c84d560dae770f041be.png](https://cdn.nlark.com/yuque/0/2023/png/39174886/1699534117037-91cb1201-8ea3-4448-b1e1-ad024992d250.png#averageHue=%23fdfcfc&clientId=u72270d6e-ec62-4&from=paste&height=699&id=u7e39b862&originHeight=874&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=119327&status=done&style=none&taskId=u598c6106-6dcb-46b2-b945-c24269de28b&title=&width=1534.4)
+## 下周计划
+
+- 
+
 ## 总结
-本周期中考试周在考试和学习中夹着，然后又有开源报告工作，结课论文报告，本以为本周没什么大比赛，可能就是复现之前的比赛题顺便多刷刷nss和buu上的题，突然事情多了起来，那天大家搜集开源情报时，黄师傅突然展示脱发真的很累的一周。
+
 
