@@ -83,7 +83,7 @@ print("Decrypted plaintext:", plaintext)
 
 ### [ISCTF 2024]《回忆安魂曲》--第三章：逃不出的黑墙
 用IDA直接打开附件分析，找到main函数后进行分析，结果如下：
-![](https://user.qzone.qq.com/934483106/photo/V52mtLJJ3HJION2p4keN1yJtcH3fCpcu/batchid/1731666276020000)
+![](https://a1.qpic.cn/psc?/V52mtLJJ3HJION2p4keN1yJtcH3fCpcu/LiySpxowE0yeWXwBdXN*SRCr4lHzWCN8s9GX0SmXNtq9G2ULJvLgIAiaImAbA9wve7Gdy6V5iEmylPVwzW9L9.lI*xfrs3ALdrntscZHKjY!/c&ek=1&kp=1&pt=0&bo=2QL5AdkC.QEBFzA!&t=5&tl=3&vuin=934483106&tm=1731834000&dis_t=1731837253&dis_k=aaafe01e794b85333a14f8ac2e496116&sce=60-2-2&rf=0-0)
 由此可推理出这是一个迷宫游戏，love作为方向键分别控制角色向上、下、左、右这四个方向移动，然后地图的数据储存在aP[]这个字符串中，井号代表墙，点代表路，为一个30*30的地图。编写代码打印出这个地图并得出步骤（注意，实际的起点和终点为P和E，C是一个假的终点！）
 ![](https://m.qpic.cn/psc?/V52mtLJJ3HJION2p4keN1yJtcH3fCpcu/LiySpxowE0yeWXwBdXN*SSlyFwfLxGvix9eEjGWNViMkpSWFVJcPSczBAPpLNWagnUbPJyM6.LaQiiusaVFYbbnHUTkEvTYE5Cb9XV.b*84!/b&bo=YQNSAwAAAAADFwE!&rf=viewer_4)
 走出迷宫后得到步骤为ooeeeeoooooovvoovvooeeooeelllleeooooeeeeooeeooeelleellllvvoovvlllleellvvvvllvvlleelllleeeeeeoovvvvooooeelleeooooooeelleeeeeeoooovvllvvoovvooooeeooeeoooovvooeeeeooeellllee
@@ -125,7 +125,6 @@ print("Original flag:", original_flag)
 
 ```
 由此即可得出flag
-30nyB6Ql0uDswoKYUuMLaUsnpU8EV82Q!/b&bo=igPJAgAAAAADF3A!&rf=viewer_4)
 ### [ISCTF]py不好，会被ban
 Python解包，按上面的方法用pyinstxtractor.py解包，然后补充MagicNumber，之后进行反编译但是无法打开，考虑使用pycdas查看汇编指令，在AI的帮助下将汇编指令还原为Python源码，并进行分析，可写出解密代码
 ![](https://m.qpic.cn/psc?/V52mtLJJ3HJION2p4keN1yJtcH3fCpcu/LiySpxowE0yeWXwBdXN*SbQxds0gHQf5*h5CIL9jiLIbdmf9F6f9ytWWDtNJ6ezbVcfbelOg6FLx38GEpbbPcUZMH0wGfgATtXp37iihTXs!/b&bo=9AY4BAAAAAADB.w!&rf=viewer_4)
