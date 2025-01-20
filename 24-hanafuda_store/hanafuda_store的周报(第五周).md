@@ -15,7 +15,7 @@ python pyinstxtractor.py <要解包的文件名>.exe
 #### 3.反汇编得到Python源文件
 此时的pyc文件已经可以进行反汇编了，这里可以使用的工具有两种，第一个是`uncompyle6.exe`，需要拖至和目标pyc文件所在目录，然后使用指令
 ```
-uncompyle6 文件名.pyc > 文件名.py
+python uncompyle6.exe 文件名.pyc
 ```
 也可使用`pycdc.exe`，需要拖至和目标pyc文件所在目录，然后使用指令
 ```
