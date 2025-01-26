@@ -30,7 +30,7 @@ else
 
 Bp抓包一下，修改响应头，利用php://input来实行命令，payload如下图所示：
 
-![a5dc37bf934b9a272a0c2f0a5dcc8e2a](C:\Users\lenovo\AppData\Roaming\Typora\24-aye-hoyosei\image\a5dc37bf934b9a272a0c2f0a5dcc8e2a.png)
+![a5dc37bf934b9a272a0c2f0a5dcc8e2a](image/a5dc37bf934b9a272a0c2f0a5dcc8e2a-1737887566898-3.png)
 
 send以后响应头即可找到flag
 
@@ -38,9 +38,9 @@ send以后响应头即可找到flag
 
 打开一看是uu原题，查一下笔记，bp抓一把就打了
 
-![屏幕截图 2025-01-25 095941](C:\Users\lenovo\AppData\Roaming\Typora\24-aye-hoyosei\image\屏幕截图 2025-01-25 095941.png)
+![屏幕截图 2025-01-25 095941](image/屏幕截图 2025-01-25 095941.png)
 
-![屏幕截图 2025-01-25 100023](C:\Users\lenovo\AppData\Roaming\Typora\24-aye-hoyosei\image\屏幕截图 2025-01-25 100023.png)
+![屏幕截图 2025-01-25 100023](image/屏幕截图 2025-01-25 100023.png)
 
 这里补充一下思路：
 
