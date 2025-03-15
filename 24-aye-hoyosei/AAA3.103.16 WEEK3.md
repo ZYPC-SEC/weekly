@@ -14,7 +14,7 @@ ikun应援网站，往下翻可以购买东西，右键查看源码，有些提�
 
 一页一页找不太现实，写一个脚本自己翻页找lv6吧。
 
-![image-20250315215803284](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315215803284.png)
+![image-20250315232723962](image/AAA3.103.16 WEEK3/image-20250315232723962.png)
 
 右键发现了写lv6是图片，写个脚本找一下
 
@@ -52,21 +52,21 @@ while i<1000:
 
 改完价格后发现购物车被清空了，只好再改一下折扣了：
 
-![image-20250315215900254](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315215900254.png)
+![image-20250315232739525](image/AAA3.103.16 WEEK3/image-20250315232739525.png)
 
 send以后响应头的码变302重定向了
 
-![image-20250315215919765](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315215919765.png)
+![image-20250315232747575](image/AAA3.103.16 WEEK3/image-20250315232747575.png)
 
 打开这个location地址看看，发现需要admin访问,bp再抓包一下，看看有没有session，cookie之类的:
 
-![image-20250315215932473](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315215932473.png)
+![image-20250315232759518](image/AAA3.103.16 WEEK3/image-20250315232759518.png)
 
 没看到session，却看到一个JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjEifQ.8iYM4QgkAw4NpjpP8tEn7MBbZoF-Kj8YRbosz3Qrr-Q
 
 在线解密一下：
 
-![image-20250315215948726](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315215948726.png)
+![image-20250315232808254](image/AAA3.103.16 WEEK3/image-20250315232808254.png)
 
 可以看出来，我们还需要一个密钥:
 
@@ -76,19 +76,19 @@ make
 
 ./jwtcrack eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjEifQ.8iYM4QgkAw4NpjpP8tEn7MBbZoF-Kj8YRbosz3Qrr-Q
 
-![image-20250315220009659](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315220009659.png)
+![image-20250315232817011](image/AAA3.103.16 WEEK3/image-20250315232817011.png)
 
 可得密钥为1Kun
 
 把1改成admin：
 
-![image-20250315220026351](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315220026351.png)
+![image-20250315232828924](image/AAA3.103.16 WEEK3/image-20250315232828924.png)
 
 得到新的jwt：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.40on__HQ8B2-wM1ZSwax3ivRK4j54jlaXv-1JjQynjo
 
 hackbar传参得到了回显，审计代码即可发现提示：
 
-![image-20250315220044462](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315220044462.png)
+![image-20250315232839696](image/AAA3.103.16 WEEK3/image-20250315232839696.png)
 
 打开/static/asd1f654e683wq/www.zip，看看好东西，即可在本地得到源码
 
@@ -164,4 +164,4 @@ payload：
 become=c__builtin__%0Aeval%0Ap0%0A%28S%22open%28%27/flag.txt%27%2C%27r%27%29.read%28%29%22%0Ap1%0Atp2%0ARp3%0A.
 ```
 
-![image-20250315220232099](C:\Users\lenovo\Desktop\24-aye-hoyosei\image\image-20250315220232099.png)
+![image-20250315232853149](image/AAA3.103.16 WEEK3/image-20250315232853149.png)
