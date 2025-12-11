@@ -18,7 +18,7 @@ python逆向-逆向pyinstaller打包的exe程序反编译获取源代码
   
   
 
-https://img.cdn1.vip/i/69396c442a3fe_1765370948.webp
+!(https://img.cdn1.vip/i/69396c442a3fe_1765370948.web)
 
 
 
@@ -191,6 +191,7 @@ https://img.cdn1.vip/i/693aba9e0e38e_1765456542.webp
     with open('example.pyc', 'rb') as f:
         f.read(16)  # 跳过头部
         code_obj = marshal.load(f)
+
         print(code_obj)
     ```
     
