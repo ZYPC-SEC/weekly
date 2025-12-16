@@ -32,8 +32,7 @@
   在过往的一道迷宫图中半天拿不出地图，这时候动态就排上用场了，当发现题目中涉及到的程序内部值无法查看和获取时，可以通过动调获取内容数值。
   1.迷宫先找迷宫
   
-  <img title= " " src="https://img.cdn1.vip/i/69396dcb89a45_1765371339.png" 
-    alt="8ce1f759-a2c9-461e-8c9a-3a1a2e41e2ab" style="zoom:67%;">
+  <img title=" " src="https://img.cdn1.vip/i/69396dcb89a45_1765371339.png" alt="8ce1f759-a2c9-461e-8c9a-3a1a2e41e2ab" style="zoom:67%;">
   
   
   
