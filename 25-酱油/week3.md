@@ -160,9 +160,13 @@
 - [FSCTF 2023]EZRC4
   在main函数中直接给出密钥了和密文了(  strcpy(key, "wanyuanshenwande");  )函数名字就直接是rc4_crypt。
   (偷懒可以直接动调，在return函数之前在加密函数之后f9打断点，然后直接运行看到几个地址
-  ![50399135-67a2-414e-b068-6a1c5fb80321](file:///C:/Users/1/Pictures/Typedown/50399135-67a2-414e-b068-6a1c5fb80321.png)
+  
+  ![50399135-67a2-414e-b068-6a1c5fb80321](https://img.cdn1.vip/i/693ac47c4b9b8_1765459068.png)
+  
   最上面那个就有flag
-  ![e59632e9-911d-4e96-8c59-34be96ba9910](file:///C:/Users/1/Pictures/Typedown/e59632e9-911d-4e96-8c59-34be96ba9910.png)
+  
+  ![e59632e9-911d-4e96-8c59-34be96ba9910](https://img.cdn1.vip/i/693ac4a80e237_1765459112.webp)
+  
   )
   写脚本的话这题给的信息比较全，key和data都在main里面
 
@@ -351,7 +355,9 @@ RC4 是一种对称流密码算法，特点是使用简单且高效的密钥流�
 
 ### RC4 的工作原理
 
-<img title="" src="file:///C:/Users/1/Pictures/Typedown/4c790962-6176-4da5-a510-f2b231457e39.png" alt="4c790962-6176-4da5-a510-f2b231457e39" style="zoom:50%;">
+<img title="" src="https://img.cdn1.vip/i/693ac4d497649_1765459156.webp"
+	alt="4c790962-6176-4da5-a510-f2b231457e39" style="zoom:50%;">
+
 
 RC4 算法分为两个阶段： 
 
@@ -373,7 +379,9 @@ RC4 算法分为两个阶段：
 
 - 根据 S 数组生成伪随机字节流：
 
-- <img src="file:///C:/Users/1/Pictures/Typedown/784d1c1d-722a-48cf-91d8-34b3c83adaf0.png" title="" alt="784d1c1d-722a-48cf-91d8-34b3c83adaf0" style="zoom:67%;">
+- <img src="https://img.cdn1.vip/i/693ac4c149d6b_1765459137.png" 
+	  title="" alt="784d1c1d-722a-48cf-91d8-34b3c83adaf0" style="zoom:67%;">
+
 
 识别的话较长度为256的数组，三个关键变量S-Box，密钥K char key[256]，临时向量k 长度也为256
 
@@ -454,7 +462,10 @@ typedef struct hello_zypc {
 
 # 05
 
-<img src="file:///C:/Users/1/Pictures/Typedown/b4c95233-2efc-497c-8f40-38e16f39793e.png" title="" alt="b4c95233-2efc-497c-8f40-38e16f39793e" style="zoom:67%;">
+
+<img src="https://img.cdn1.vip/i/693ac55ec785a_1765459294.png" 
+	title="" alt="b4c95233-2efc-497c-8f40-38e16f39793e" style="zoom:67%;">
+	
 
 这题核心就是     **C 语言中二维数组的内存布局、数组名与指针的关系**
 
@@ -507,3 +518,5 @@ text段
 - text段被用于保持实际的代码该段必须以全局声明_start开头，该声明告诉内核程序从何处开始执行。
 
 - 注释——汇编语言注释以分号（;）开头。它可以包含任何可打印字符，包括空格。
+
+
