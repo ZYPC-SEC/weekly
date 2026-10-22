@@ -207,7 +207,7 @@ VS code左侧有树状的按钮，按一下进入Git界面，如果没有克隆�
 
 ### 第四步 申请更改后的fork仓库并入原仓库
 
-再次打开[智邮普创的周报仓库]([github.com](https://github.com/ZYPC-SEC/weekly))（在此之前，可以访问一下自己的Github界面然后确认你的修改交上去了）了，在最上面找到`Pull requests（就是我们常说的“PR”）`并点进去，将`head repository`改成自己的周报仓库，然后提交PR申请，等到老登同意，周报就交上去了
+再次打开[智邮普创的周报仓库]([github.com](https://github.com/ZYPC-SEC/weekly))（在此之前，可以访问一下自己的Github界面然后确认你的修改交上去了），在最上面找到`Pull requests（就是我们常说的“PR”）`并点进去，点击上面蓝色的`compare across forks`，并将`head repository`改成自己的周报仓库，然后提交PR申请，等到老登同意，周报就交上去了
 
 > 在提交前先在自己的GitHub页面同步一下上游（Sync fork），然后在VS code中拉取（Pull）修改以确保你的仓库和文件都是最新的，养成这样的好习惯可以避免以后代码管理混乱
 >
