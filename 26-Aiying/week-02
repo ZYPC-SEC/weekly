@@ -25,7 +25,7 @@ tan@DESKTOP-XXXX:~$
  │               └────────────── 主机名
  └───────────────────── 当前用户名
 
-![image-20261025200954091](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20261025200954091.png)
+![alt text](image-2.png)
 
 ### 1.3.速查（五个元命令）
 
@@ -129,7 +129,7 @@ Windows可以分很多盘；但是Linux更像一颗树，所有的东西都挂�
 
 `-bash: X: No such file` → **X 这个命令不存在**（往往是拼写/空格问题）； `cat: X: No such file` → **命令没问题，是 X 这个文件不存在**。 前缀不同，排查方向完全不同。
 
-![image-20261026170612960](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20261026170612960.png)
+![alt text](image-1.png)
 
 上图便是我把目录当作程序跑而产生的报错
 
